@@ -1,2 +1,2 @@
 # unsw-lecture-times
-Static page that requests a heatmap of UNSW lecture times
+Python server that serves a heatmap of UNSW lecture times
