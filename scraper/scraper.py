@@ -61,7 +61,7 @@ def total_count(lectures):
 
 def main():
     if len(sys.argv) <= 1:
-        exit("Usage: python lectures.py COMP1917 COMP1921 COMP1927 ...")
+        exit("Usage: python scraper.py COMP1917 COMP1921 COMP1927 ...")
     lectures = get_lectures(sys.argv[1:])
     total = total_count(lectures)
     ordered_count = sorted(total.items(), key=lambda item: (DAYS.index(item[0][0]), int(item[0][1].split(':')[0])))
