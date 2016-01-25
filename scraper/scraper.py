@@ -11,6 +11,10 @@ BASE_URL = "http://www.cse.unsw.edu.au/~teachadmin/lecture_times/" + SEMESTER
 DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 
 
+def html_extract_absolute_urls(base_url, html):
+    pass
+
+
 def get_courses(course_category):
     index = requests.get('{}/{}'.format(BASE_URL, course_category))
     subpages = re.findall(r'A HREF="(.*?\.html)"', index.text)
