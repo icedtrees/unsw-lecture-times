@@ -14,6 +14,14 @@ class TestHtmlLinkExtractor(unittest.TestCase):
         links = html_extract_absolute_urls("http://www.example.com", html)
         self.assertListEqual(links, [])
 
+    def test_fake_tags(self):
+        links = html_extract_absolute_urls("http://www.example.com", '&lt;a href="link"&gt;text&lt;/a&gt;')
+        self.assertListEqual(links, [])
+
+    def test_fake_attributes(self):
+        links = html_extract_absolute_urls("http://www.example.com", '<a .href="link"></a>')
+        self.assertListEqual(links, [])
+
     def test_one_link(self):
         links = html_extract_absolute_urls("http://www.example.com", '<a href="link1">text</a>')
         self.assertListEqual(links, ["http://www.example.com/link1"])
@@ -22,13 +30,16 @@ class TestHtmlLinkExtractor(unittest.TestCase):
         links = html_extract_absolute_urls("http://www.example.com", '<a href="link1">text</a><a href="link2">text</a>')
         self.assertListEqual(links, ["http://www.example.com/link1", "http://www.example.com/link2"])
 
+    def test_multiple_links_multiline(self):
+        links = html_extract_absolute_urls("http://www.example.com", '<a href="link1">t</a>\n<a href="link2">t</a>"')
+
     def test_capitalized_link(self):
-        links = html_extract_absolute_urls("http://example.com", '<A HREF="/link">text</A>')
-        self.assertListEqual(links, ["http:/www.example.com/"])
+        links = html_extract_absolute_urls("http://www.example.com", '<A HREF="/link">text</A>')
+        self.assertListEqual(links, ["http://www.example.com/link"])
 
     def test_mixedcase_link(self):
         links = html_extract_absolute_urls("http://www.example.com", '<A HrEf="/link">text</a>')
-        self.assertListEqual(links, ["http://www.example.com"])
+        self.assertListEqual(links, ["http://www.example.com/link"])
 
     def test_link_with_punctuation(self):
         links = html_extract_absolute_urls("http://www.example.com", '<a href="aA/0.-_~!$&\'()*+,;=:@%15">text</a>')
@@ -38,9 +49,14 @@ class TestHtmlLinkExtractor(unittest.TestCase):
         links = html_extract_absolute_urls("http://www.example.com", '<a href="mIxEdCaSeLiNk">text</a>')
         self.assertListEqual(links, ["http://www.example.com/mIxEdCaSeLiNk"])
 
-    def test_leading_and_trailing_spaces(self):
-        links = html_extract_absolute_urls("http://www.example.com", '<a href="     link     ">text</a>')
+    def test_additional_whitespace(self):
+        html = ' \t <a \t href \t = \t " \t link \t " \t > \t text \t </ \t a \t > \t '
+        links = html_extract_absolute_urls("http://www.example.com", html)
         self.assertListEqual(links, ["http://www.example.com/link"])
+
+    def test_no_spaces(self):
+        links = html_extract_absolute_urls("http://www.example.com", '<ahref="link">text</a>')
+        self.assertListEqual(links, [])
 
     def test_absolute_url(self):
         links = html_extract_absolute_urls("http://www.example.com", '<a href="http://www.example2.com/path">text</a>')
@@ -60,5 +76,5 @@ class TestHtmlLinkExtractor(unittest.TestCase):
         self.assertListEqual(links, ["http://www.example.com/link"])
 
     def test_relative_path(self):
-        links = html_extract_absolute_urls("http://www.example.com/path1", '<a href="../path2">text</a>')
+        links = html_extract_absolute_urls("http://www.example.com/folder1/path1", '<a href="../path2">text</a>')
         self.assertListEqual(links, ["http://www.example.com/path2"])
