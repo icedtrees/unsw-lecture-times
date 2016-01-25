@@ -3,6 +3,9 @@
 import re
 import sys
 from collections import Counter
+from urlparse import urljoin
+
+from bs4 import BeautifulSoup
 
 import requests
 
@@ -12,7 +15,10 @@ DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 
 
 def html_extract_absolute_urls(base_url, html):
-    pass
+    """Crawls a html string and returns a list of the absolute urls of all the links to subpages."""
+    relative_links = [a['href'].strip() for a in BeautifulSoup(html).find_all('a', href=True)]
+    absolute_links = [urljoin(base_url, relative) for relative in relative_links]
+    return absolute_links
 
 
 def get_courses(course_category):
